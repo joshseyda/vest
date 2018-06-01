@@ -4,7 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  has_many :investments
-  has_many :holdings, through: :investments
+  has_many :portfolios
+  has_many :holdings, through: :portfolios
   
 end

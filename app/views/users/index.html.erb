@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Users</h1>
+<h1><%= @user.username.capitalize %>'s Portfolio</h1>
 
 <table>
   <thead>
@@ -10,11 +10,14 @@
   </thead>
 
   <tbody>
-    <% @users.each do |user| %>
+    <% @user_holdings.each do |holding| %>
       <tr>
-        <td><%= link_to 'Show', user %></td>
-        <td><%= link_to 'Edit', edit_user_path(user) %></td>
-        <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% @asset = Holding.find(holding.holding_id) %>
+        <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a></td>
+        <td><a href="/<%= holding.holding_type.downcase %>"><%= holding.holding_type %></a></td>
+        <td><%= holding.num_of_shares %></td>
+        <td><%= holding.created_at %></td>
+        
       </tr>
     <% end %>
   </tbody>
