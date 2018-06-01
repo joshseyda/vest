@@ -4,7 +4,8 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    @user = current_user
+    @user_holdings = @user.portfolios
   end
 
   # GET /users/1

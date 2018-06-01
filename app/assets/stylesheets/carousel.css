@@ -8,6 +8,14 @@ body {
   color: #5a5a5a;
 }
 
+/* D3 Graph style */
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
 
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
