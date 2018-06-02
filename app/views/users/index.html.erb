@@ -1,28 +1,77 @@
 <p id="notice"><%= notice %></p>
-
+<script> let portfolio = {};</script>
 <h1><%= @user.username.capitalize %>'s Portfolio</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @user_holdings.each do |holding| %>
-      <tr>
-        <% @asset = Holding.find(holding.holding_id) %>
-        <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a></td>
-        <td><a href="/<%= holding.holding_type.downcase %>"><%= holding.holding_type %></a></td>
-        <td><%= holding.num_of_shares %></td>
-        <td><%= holding.created_at %></td>
-        
-      </tr>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @user_holdings.each do |holding| %>
+            <tr>
+              <% @asset = Holding.find(holding.holding_id) %>
+              <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a></td>
+              <td><a href="/<%= holding.holding_type.downcase %>"><%= holding.holding_type %></a></td>
+              <td><%= holding.num_of_shares %></td>
+              <td><%= holding.created_at %></td>
+            </tr>   
+<script type="text/javascript">  
+  $(document).ready(function () {
+    console.log("<%=@asset.name%>")
+    <% if holding.holding_type == "NYSE" %>
+      $.ajax({
+        url: "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=<%=@asset.name%>&interval=1min&apikey=<%=ENV['ALPHA_VANTAGE_KEY']%>",
+          type: 'GET',
+            dataType: "JSON",
+              success: function(data) {
+                console.log(data)
+                let symbol_key = data["Meta Data"]["2. Symbol"];
+                let last_price = data["Time Series (1min)"];
+                let price_key = Object.keys(last_price);
+                portfolio[symbol_key] = price_key[0];
+                  console.log(portfolio)
+                  },
+              error: function (request, status, error) {
+                alert(error);
+              }
+                      });
+      <% else %>
+             $.ajax({
+                url: "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_INTRADAY&symbol=<%=@asset.name%>&market=USD&apikey=<%=ENV['ALPHA_VANTAGE_KEY']%>",
+                  type: 'GET',
+                  dataType: "JSON",
+                  success: function(data) {
+                    console.log(data)
+                    let symbol_key = data["Meta Data"]["2. Digital Currency Code"];
+                    let last_price = data["Time Series (Digital Currency Intraday)"]
+                    let price_key = Object.keys(last_price);
+                    portfolio[symbol_key] = price_key[0];
+                    console.log(portfolio)
+                  },
+                  error: function (request, status, error) {
+                    alert(error);
+                  }
+                      });
+                       <% end %>
+                  });
+                 
+              </script>
+      
+      <%# @portfolio[@asset.name] = holding.num_of_shares *  %>
     <% end %>
   </tbody>
 </table>
+</div>
+</div>
+  <div class="row">
+    <div class="col-sm-6" id="graph-div">
+    </div>
+    </div>
+</div>
 
 <br>
-
 <%= link_to 'New User', new_user_path %>

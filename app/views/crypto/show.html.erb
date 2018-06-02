@@ -38,7 +38,7 @@ var svg = d3.select("main").append("svg")
 // https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=BTC&market=EUR&apikey=V1YUZU7JYIN1PU8B&datatype&datatype=csv
 
 
-d3.csv("https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=<%= @crypto.name %>&market=EUR&apikey=<%= ENV['ALPHA_VANTAGE_KEY']%>&datatype&datatype=csv", function(error, data) {
+d3.csv("https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=<%= @crypto.name %>&market=USD&apikey=<%= ENV['ALPHA_VANTAGE_KEY']%>&datatype&datatype=csv", function(error, data) {
   if (error) throw error;
   // format the data
   data.forEach(function(d) {
