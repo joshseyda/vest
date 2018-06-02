@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 require 'csv'
 
-arr = ["BTC", "ETH", "XRP", "EOS", "ADA", "LTC", "XLM", "TRX", "NEO"]
+arr = ["BTC", "ETH", "XRP", "EOS", "LTC", "XLM", "TRX", "NEO"]
 arr.each do |elem|
     Holding.create(name: elem, holding_type: "CRYPTO")
 end
