@@ -28,7 +28,7 @@ class PortfoliosController < ApplicationController
 
     respond_to do |format|
       if @portfolio.save
-        format.html { redirect_to @portfolio, notice: 'Portfolio was successfully created.' }
+        format.html { redirect_to '/users', notice: 'Portfolio was successfully updated.' }
         format.json { render :show, status: :created, location: @portfolio }
       else
         format.html { render :new }
@@ -69,6 +69,6 @@ class PortfoliosController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def portfolio_params
-      params.fetch(:portfolio, {})
+      params.require(:portfolio).permit(:user_id, :holding_type, :holding_id, :num_of_shares)
     end
 end

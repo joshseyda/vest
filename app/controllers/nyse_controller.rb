@@ -4,17 +4,18 @@ class NyseController < ApplicationController
       # GET /nyse.json
       def index
         @nyse = Holding.where("holding_type = 'NYSE'")
+        
       end
     
       # GET /nyse/1
       # GET /nyse/1.json
       def show
-        
+        @portfolio = Portfolio.new
       end
     
       # GET /nyse/new
       def new
-        @nyse = Holding.new
+        @portfolio = Portfolio.new
       end
     
       # GET /nyse/1/edit
@@ -24,8 +25,8 @@ class NyseController < ApplicationController
       # POST /nyse
       # POST /nyse.json
       def create
-        @nyse = nyse.new(nyse_params)
-    
+        @portfolio = Portfolio.new(user_id: current_user.id, holding_type: "NYSE", holding_id: (Holding.where("name = '#{params[:id]}'").first.id), num_of_shares: params[:num_of_shares]);
+        @portfolio.save
         respond_to do |format|
           if @nyse.save
             format.html { redirect_to @nyse, notice: 'nyse was successfully created.' }
