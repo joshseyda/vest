@@ -27,13 +27,13 @@ end
     @port = Portfolio.create(user_id: @rand1, holding_type: @holding.holding_type, holding_id: @holding.id, num_of_shares: @rand2)
 end
  
-50.times do
- @holding = Holding.where("holding_type ='CRYPTO'")
- @holding_sample = @holding.sample
- @rand1 = 1+rand(20)
-    @rand2 = 1+rand(10000)
-    @port = Portfolio.create(user_id: @rand1, holding_type: @holding_sample.holding_type, holding_id: @holding_sample.id, num_of_shares: @rand2)
-end
+# 50.times do
+#  @holding = Holding.where("holding_type ='CRYPTO'")
+#  @holding_sample = @holding.sample
+#  @rand1 = 1+rand(20)
+#     @rand2 = 1+rand(10000)
+#     @port = Portfolio.create(user_id: @rand1, holding_type: @holding_sample.holding_type, holding_id: @holding_sample.id, num_of_shares: @rand2)
+# end
 
 
 
