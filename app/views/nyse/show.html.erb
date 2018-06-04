@@ -1,9 +1,23 @@
 <p id="notice"><%= notice %></p>
 
 <h1><%= @nyse.name %></h1>
-
+<div class="extras"></div>
 <!-- load the d3.js library -->     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+            <script>$.ajax({
+              url: "https://api.iextrading.com/1.0/stock/<%=@nyse.name%>/company",
+              type: 'GET',
+              dataType: "JSON",
+              success: function(data) {
+                console.log(data)
+                $(".extras").after(`<p class="show_desc">${data.description}</p>`);
+                $(".extras").append(`<p><a href="${data.website}" target="_blank">${data.companyName}</a></p><p>Industry: ${data.industry}</p><p>Sector: ${data.sector}</p>`);
+                },
+            error: function (request, status, error) {
+              alert(error);
+            }
+          });
+            </script>
 <script>
 
 // set the dimensions and margins of the graph
@@ -34,13 +48,9 @@ var svg = d3.select("main").append("svg")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-// crypto needs this format
-// https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=BTC&market=EUR&apikey=V1YUZU7JYIN1PU8B&datatype&datatype=csv
-// d.date = parseTime(d.timestamp);
-// d.close = +d["close (USD)"];
-
-d3.csv("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=<%= @nyse.name %>&outputsize=full&apikey=ENV['ALPHA_VANTAGE_KEY']&datatype=csv", function(error, data) {
+d3.csv("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=<%= @nyse.name %>&outputsize=full&apikey=<%= ENV['ALPHA_VANTAGE_KEY'] %>&datatype=csv", function(error, data) {
   if (error) throw error;
+  $('.extras').append(`<p>Most recent price: $${data[0].close}</p>`);
   // format the data
   data.forEach(function(d) {
           console.log(d);
