@@ -1,4 +1,203 @@
-<p id="notice"><%= notice %></p>
+<!-- load the d3.js library -->     
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+<script> let portfolio = [];</script>
+<div class="container">
+<h1><%= @user.username.capitalize %>'s Portfolio</h1>
+  <div class="row">
+    <div class="col-sm-6">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="3"></th>
+          </tr>
+        </thead>
+        <tbody >
+          <% @user_holdings.each do |holding| %>
+          <% @asset = Holding.find(holding.holding_id) %>
+            <tr class="<%= @asset.name %>">
+              <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a> 
+                <!-- Button trigger modal -->
+                <button type="button" class="btn  offset-5" data-id="<%= @asset.name %>" data-toggle="modal" data-target="#<%= @asset.name %>">Edit</button>
+                <!-- Modal -->
+                <div class="modal fade " id="<%= @asset.name %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Edit your <%= @asset.name%> Shares</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div  class="form-signin">
+                        <%= form_for  holding, remote: true, authenticity_token: true do |f| %>
+                          <%= f.hidden_field :user_id, value: current_user.id %>
+                          <%= f.hidden_field :holding_id, value: @asset.id %>
+                          <%= f.hidden_field :holding_type, value: "NYSE" %>
+                          <%= f.label :number_of_shares, class:"d-block"  %>
+                          <%= f.number_field :num_of_shares, class:"num_of_shares", required:true, placeholder: holding.num_of_shares %>
+                          <%= f.submit "Add" %>
+                        <% end %>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                      <%= link_to 'Delete', portfolio_path(@asset), method: :delete %>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </td>
+                <script>
+                  $('#<%= @asset.name %>').on('click', function(){$('#<%= @asset.name %>').modal(`show`)});
+                </script>
+              <td><%= holding.num_of_shares %> Shares</td>
+            </tr>   
+            <script>
+            $.ajax({
+              url: "https://api.iextrading.com/1.0/stock/<%=@asset.name%>/company",
+              type: 'GET',
+              dataType: "JSON",
+              success: function(data) {
+                console.log(data)
+                $(".<%= @asset.name %>").after(`<tr><td>${data.description}</td></tr>`);
+                $(".<%= @asset.name %>").after(`<tr><td><a href="${data.website}" target="_blank">${data.companyName}</a></td><td>${data.industry}</td><td>${data.sector}</td></tr>`);
+                },
+            error: function (request, status, error) {
+              alert(error);
+            }
+          });
+            </script>
+    <div id="chart"></div>
+    <script data-require="d3@*" data-semver="4.0.0" src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+    $(document).ready(function () {
+      $.ajax({
+        url: "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=<%=@asset.name%>&interval=1min&apikey=<%=ENV['ALPHA_VANTAGE_KEY']%>",
+        type: 'GET',
+        dataType: "JSON",
+          success: function(data) {
+            console.log(data)
+            let symbol_key = data["Meta Data"]["2. Symbol"];
+            let last_price = data["Time Series (1min)"];
+            let price_key = Object.keys(last_price)[0];
+            let first_value = last_price[price_key]["4. close"];
+            let final_value = (first_value * <%= holding.num_of_shares %>);
+            let holding_hash = {name: symbol_key , price: final_value};
+            portfolio.push(holding_hash);
+            console.log(portfolio)
+            let ajax_complete = portfolio.length;
+            console.log(ajax_complete);
+              if (ajax_complete >= <%= @user_holdings.length %>){
+      (function(d3) {
 
-<%= link_to 'Edit', edit_user_path(@user) %> |
-<%= link_to 'Back', users_path %>
+        var width = 360;
+        var height = 360;
+        var radius = Math.min(width, height) / 2;
+        var donutWidth = 75;
+        var legendRectSize = 18;
+        var legendSpacing = 4;
+
+        var color = d3.scaleOrdinal(d3.schemeCategory20b);
+
+        var svg = d3.select('#chart')
+          .append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', 'translate(' + (width / 2) + 
+            ',' + (height / 2) + ')');
+
+        var arc = d3.arc()
+          .innerRadius(radius - donutWidth)
+          .outerRadius(radius);
+
+        var pie = d3.pie()
+          .value(function(d) { return d.count; })
+          .sort(null);
+
+        var tooltip = d3.select('#chart')                               // NEW
+          .append('div')                                                // NEW
+          .attr('class', 'tooltip');                                    // NEW
+                      
+        tooltip.append('div')                                           // NEW
+          .attr('class', 'label');                                      // NEW
+             
+        tooltip.append('div')                                           // NEW
+          .attr('class', 'count');                                      // NEW
+
+        tooltip.append('div')                                           // NEW
+          .attr('class', 'percent');                                    // NEW
+
+            portfolio.forEach(function(d) {
+                d.price = +d.price;
+                d.name = d.name;
+                          })
+
+          var path = svg.selectAll('path')
+            .data(pie(dataset))
+            .enter()
+            .append('path')
+            .attr('d', arc)
+            .attr('fill', function(d, i) { 
+              return color(d.data.label); 
+            });
+
+          path.on('mouseover', function(d) {                            // NEW
+            var total = d3.sum(dataset.map(function(d) {                // NEW
+              return d.count;                                           // NEW
+            }));                                                        // NEW
+            var percent = Math.round(1000 * d.data.count / total) / 10; // NEW
+            tooltip.select('.label').html(d.data.label);                // NEW
+            tooltip.select('.count').html(d.data.count);                // NEW
+            tooltip.select('.percent').html(percent + '%');             // NEW
+            tooltip.style('display', 'block');                          // NEW
+          });                                                           // NEW
+          
+          path.on('mouseout', function() {                              // NEW
+            tooltip.style('display', 'none');                           // NEW
+          });                                                           // NEW
+
+          /* OPTIONAL 
+          path.on('mousemove', function(d) {                            // NEW
+            tooltip.style('top', (d3.event.pageY + 10) + 'px')          // NEW
+              .style('left', (d3.event.pageX + 10) + 'px');             // NEW
+          });                                                           // NEW
+          */
+            
+          var legend = svg.selectAll('.legend')
+            .data(color.domain())
+            .enter()
+            .append('g')
+            .attr('class', 'legend')
+            .attr('transform', function(d, i) {
+              var height = legendRectSize + legendSpacing;
+              var offset =  height * color.domain().length / 2;
+              var horz = -2 * legendRectSize;
+              var vert = i * height - offset;
+              return 'translate(' + horz + ',' + vert + ')';
+            });
+
+          legend.append('rect')
+            .attr('width', legendRectSize)
+            .attr('height', legendRectSize)                                   
+            .style('fill', color)
+            .style('stroke', color);
+            
+          legend.append('text')
+            .attr('x', legendRectSize + legendSpacing)
+            .attr('y', legendRectSize - legendSpacing)
+            .text(function(d) { return d; });
+
+        });
+
+      }
+      (window.d3);
+      },
+            error: function (request, status, error) {
+              alert(error);
+            }
+          });
+           });
+    </script>
+<% end %>

@@ -54,6 +54,7 @@ class PortfoliosController < ApplicationController
   # DELETE /portfolios/1
   # DELETE /portfolios/1.json
   def destroy
+    @portfolio = Portfolio.where()
     @portfolio.destroy
     respond_to do |format|
       format.html { redirect_to portfolios_url, notice: 'Portfolio was successfully destroyed.' }

@@ -55,6 +55,7 @@ class NyseController < ApplicationController
       # DELETE /nyse/1
       # DELETE /nyse/1.json
       def destroy
+        @nyse = Holding.find(params[:id])
         @nyse.destroy
         respond_to do |format|
           format.html { redirect_to nyse_url, notice: 'NYSE was successfully destroyed.' }
