@@ -14,11 +14,46 @@
           <% @user_holdings.each do |holding| %>
           <% @asset = Holding.find(holding.holding_id) %>
             <tr class="<%= @asset.name %>">
-              <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a></td>
+              <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a> 
+                <!-- Button trigger modal -->
+                <button type="button" class="btn  offset-5" data-id="<%= @asset.name %>" data-toggle="modal" data-target="#<%= @asset.name %>">Edit</button>
+                <!-- Modal -->
+                <div class="modal fade " id="<%= @asset.name %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Edit your <%= @asset.name%> Shares</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div  class="form-signin">
+                        <%= form_for  holding, remote: true, authenticity_token: true do |f| %>
+                          <%= f.hidden_field :user_id, value: current_user.id %>
+                          <%= f.hidden_field :holding_id, value: @asset.id %>
+                          <%= f.hidden_field :holding_type, value: "NYSE" %>
+                          <%= f.label :number_of_shares, class:"d-block"  %>
+                          <%= f.number_field :num_of_shares, class:"num_of_shares", required:true, placeholder: holding.num_of_shares %>
+                          <%= f.submit "Add" %>
+                        <% end %>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                      <%= link_to 'Delete', portfolio_path(@asset), method: :delete %>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </td>
+                <script>
+                  $('#<%= @asset.name %>').on('click', function(){$('#<%= @asset.name %>').modal(`show`)});
+                </script>
               <td><%= holding.num_of_shares %> Shares</td>
-
             </tr>   
-            <script>$.ajax({
+            <script>
+            $.ajax({
               url: "https://api.iextrading.com/1.0/stock/<%=@asset.name%>/company",
               type: 'GET',
               dataType: "JSON",
@@ -56,16 +91,18 @@ $(document).ready(function () {
                       var margin = {top: 20, right: 20, bottom: 20, left: 20},
                           width = 500 - margin.right - margin.left,
                           height = 500 - margin.top - margin.bottom,
-                          radius = width/2;
+                          radius = width/2,
+                          legendRectSize = 18,                                 
+                          legendSpacing = 4; 
 
                       // color range
                       var color = d3.scaleOrdinal()
                           .range(["#b2868e", "#8eb286", "#868eb2", "#b29486", "	#86b2aa", "#f7f2f3", "#1976D2"]);
 
-                      // pie chart arc. Need to create arcs before generating pie
-                      var arc = d3.arc()
-                          .outerRadius(radius - 10)
-                          .innerRadius(0);
+
+                      var div = d3.select(".arc2").append("div")
+                          .attr("class", "tooltip")
+                          .style("opacity", 0);
 
                       // donut chart arc
                       var arc2 = d3.arc()
@@ -84,65 +121,18 @@ $(document).ready(function () {
                             console.log(d.price + "PRICE!!!!!!");
                             return d.price; });
 
-                      // define the svg for pie chart
-                      // var svg = d3.select("#graph-div").append("svg")
-                      //     .attr("width", width)
-                      //     .attr("height", height)
-                      //     .append("g")
-                      //     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
                       // define the svg donut chart
                       var svg2 = d3.select("#graph-div").append("svg")
                           .attr("width", width)
                           .attr("height", height)
                           .append("g")
                           .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                          // // parse data
-                          // portfolio.forEach(
-                          // ([key, value]) => {
-                          //   console.log(key , value)
-                          //   let name = key;
-                          //   let price = value;
-                          // });
+
+                             
                           portfolio.forEach(function(d) {
                               d.price = +d.price;
                               d.name = d.name;
                           })
-
-                        // "g element is a container used to group other SVG elements"
-                        // var g = svg.selectAll(".arc")
-                        //     .data(pie(Object.values(portfolio)))
-                        //     .enter().append("g")
-                        //     .attr("class", "arc");
-
-                        // append path 
-                        // g.append("path")
-                        //     .attr("d", arc)
-                        //     .style("fill", function(d) {
-                        //       console.log("style");
-                        //       console.log(d);
-                        //       return color(d.data.name); })
-                        //   // transition 
-                        //   .transition()
-                        //     .ease(d3.easeLinear)
-                        //     .duration(2000)
-                        //     .attrTween("d", tweenPie);
-                              
-                        // append text
-                        // g.append("text")
-                          // .transition()
-                          //   .ease(d3.easeLinear)
-                          //   .duration(2000)
-                          //   .attr("transform", function(d) { 
-                          //     console.log("transform");
-                          //     console.log(d);
-                          //     return "translate(" + labelArc.centroid(d) + ")"; })
-                          //   .attr("dy", ".35em")
-                          //   .text(function(d) { 
-                          //     console.log("text");
-                          //     console.log(d.name);
-                          //     return d.data.name; });
-                          
 
                           // "g element is a container used to group other SVG elements"
                         var g2 = svg2.selectAll(".arc2")
@@ -161,7 +151,29 @@ $(document).ready(function () {
                             .ease(d3.easeLinear)
                             .duration(2000)
                             .attrTween("d", tweenDonut);
-                              
+
+                               // add the dots with tooltips
+                              g2.selectAll("path")
+                                .data(data)
+                                .enter().append("circle")
+                                .attr("r", 1)
+                                .attr("cx", function(d) { return x(d.name); })
+                                .attr("cy", function(d) { return y(d.price); })
+                                .on("mouseover", function(d) {
+                                  div.transition()
+                                    .duration(200)
+                                    .style("opacity", .9);
+                                  div.html(d.name + "<br/>" + d.price)
+                                    .style("left", (event.pageX) + "px")
+                                    .style("top", (event.pageY - 28) + "px");
+                                  })
+                                .on("mouseout", function(d) {
+                                  div.transition()
+                                    .duration(500)
+                                    .style("opacity", 0);
+                                  });
+
+
                         // append text
                         g2.append("text")
                           .transition()
@@ -175,8 +187,10 @@ $(document).ready(function () {
                             .text(function(d) { 
                               console.log(d.data.name);
                               console.log(d);
-                              return d.data.name; });
+                              return `${d.data.name} $${d.data.price.toFixed(2)}` ; });
                       };
+                        
+
 
 
                       // Helper function for animation of pie chart and donut chart
@@ -196,169 +210,7 @@ $(document).ready(function () {
               alert(error);
             }
           });
-      <% else%>
-             $.ajax({
-                url: "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_INTRADAY&symbol=<%=@asset.name%>&market=USD&apikey=<%=ENV['ALPHA_VANTAGE_KEY']%>",
-                type: 'GET',
-                dataType: "JSON",
-                  success: function(data) {
-                    console.log(data)
-                    let symbol_key = data["Meta Data"]["2. Digital Currency Code"];
-                    let last_price = data["Time Series (Digital Currency Intraday)"]
-                    let price_key = Object.keys(last_price)[0];
-                    let first_value = last_price[price_key]["1b. price (USD)"];
-                    let final_value = (first_value * <%= holding.num_of_shares %>);
-                    let holding_hash = {name: symbol_key , price: final_value};
-                    portfolio.push(holding_hash);
-                    console.log(portfolio);
-                  let ajax_complete = portfolio.length;
-                  console.log(ajax_complete);
-              if (ajax_complete >= <%= @user_holdings.length %>){
-                      // margin
-                      var margin = {top: 20, right: 20, bottom: 20, left: 20},
-                          width = 500 - margin.right - margin.left,
-                          height = 500 - margin.top - margin.bottom,
-                          radius = width/2;
-
-                      // color range
-                      var color = d3.scaleOrdinal()
-                          .range(["#b2868e", "#8eb286", "#868eb2", "#b29486", "	#86b2aa", "#f7f2f3", "#1976D2"]);
-
-                      // pie chart arc. Need to create arcs before generating pie
-                      var arc = d3.arc()
-                          .outerRadius(radius - 10)
-                          .innerRadius(0);
-
-                      // donut chart arc
-                      var arc2 = d3.arc()
-                          .outerRadius(radius - 10)
-                          .innerRadius(radius - 70);
-
-                      // arc for the labels position
-                      var labelArc = d3.arc()
-                          .outerRadius(radius - 40)
-                          .innerRadius(radius - 40);
-
-                      // generate pie chart and donut chart
-                      var pie = d3.pie()
-                          .sort(null)
-                          .value(function(d) { 
-                            console.log(d.price + "PRICE!!!!!!");
-                            return d.price; });
-
-                      // define the svg for pie chart
-                      var svg = d3.select("#graph-div").append("svg")
-                          .attr("width", width)
-                          .attr("height", height)
-                          .append("g")
-                          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                      // define the svg donut chart
-                      var svg2 = d3.select("#graph-div").append("svg")
-                          .attr("width", width)
-                          .attr("height", height)
-                          .append("g")
-                          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                          // // parse data
-                          // portfolio.forEach(
-                          // ([key, value]) => {
-                          //   console.log(key , value)
-                          //   let name = key;
-                          //   let price = value;
-                          // });
-                          portfolio.forEach(function(d) {
-                              d.price = +d.price;
-                              d.name = d.name;
-                          })
-
-                        // "g element is a container used to group other SVG elements"
-                        var g = svg.selectAll(".arc")
-                            .data(pie(Object.values(portfolio)))
-                            .enter().append("g")
-                            .attr("class", "arc");
-
-                        // append path 
-                        g.append("path")
-                            .attr("d", arc)
-                            .style("fill", function(d) {
-                              console.log("style");
-                              console.log(d);
-                              return color(d.data.name); })
-                          // transition 
-                          .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attrTween("d", tweenPie);
-                              
-                        // append text
-                        g.append("text")
-                          .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attr("transform", function(d) { 
-                              console.log("transform");
-                              console.log(d);
-                              return "translate(" + labelArc.centroid(d) + ")"; })
-                            .attr("dy", ".35em")
-                            .text(function(d) { 
-                              console.log("text");
-                              console.log(d.name);
-                              return d.data.name; });
-                          
-
-                          // "g element is a container used to group other SVG elements"
-                        var g2 = svg2.selectAll(".arc2")
-                            .data(pie(Object.values(portfolio)))
-                            .enter().append("g")
-                            .attr("class", "arc2");
-
-                        // append path 
-                        g2.append("path")
-                            .attr("d", arc2)
-                            .style("fill", function(d) { 
-                              console.log("fill");
-                              console.log(d);
-                              return color(d.data.name); })
-                            .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attrTween("d", tweenDonut);
-                              
-                        // append text
-                        g2.append("text")
-                          .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attr("transform", function(d) { 
-                              console.log("transform");
-                              console.log(d);
-                              return "translate(" + labelArc.centroid(d) + ")"; })
-                            .attr("dy", ".35em")
-                            .text(function(d) { 
-                              console.log("portfolio.name");
-                              console.log(d);
-                              return d.data.name; });
-                      };
-
-
-                      // Helper function for animation of pie chart and donut chart
-                      function tweenPie(b) {
-                        b.innerRadius = 0;
-                        var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
-                        return function(t) { return arc(i(t)); };
-                      }
-
-                      function tweenDonut(b) {
-                        b.innerRadius = 0;
-                        var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
-                        return function(t) { return arc2(i(t)); };
-                      }
-                                        },
-                                        error: function (request, status, error) {
-                                          alert(error);
-                                        }
-                                            });
-                                            <% end %>
+      <%end%>
                                         });
                  
 
