@@ -1,105 +1,105 @@
-<!-- load the d3.js library -->     
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
-<script> let portfolio = [];</script>
-<div class="container">
-<h1><%= @user.username.capitalize %>'s Portfolio</h1>
-  <div class="row">
-    <div class="col-sm-6">
-      <table>
-        <thead>
-          <tr>
-            <th colspan="3"></th>
-          </tr>
-        </thead>
-        <tbody >
-          <% @user_holdings.each do |holding| %>
-          <% @asset = Holding.find(holding.holding_id) %>
-            <tr class="<%= @asset.name %>">
-              <td><a href="/<%= @asset.holding_type.downcase %>/<%= @asset.name%>"><%= @asset.name %></a> 
-                <!-- Button trigger modal -->
-                <button type="button" class="btn  offset-5" data-id="<%= @asset.name %>" data-toggle="modal" data-target="#<%= @asset.name %>">Edit</button>
-                <!-- Modal -->
-                <div class="modal fade " id="<%= @asset.name %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Edit your <%= @asset.name%> Shares</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <div  class="form-signin">
-                        <%= form_for  holding, remote: true, authenticity_token: true do |f| %>
-                          <%= f.hidden_field :user_id, value: current_user.id %>
-                          <%= f.hidden_field :holding_id, value: @asset.id %>
-                          <%= f.hidden_field :holding_type, value: "NYSE" %>
-                          <%= f.label :number_of_shares, class:"d-block"  %>
-                          <%= f.number_field :num_of_shares, class:"num_of_shares", required:true, placeholder: holding.num_of_shares %>
-                          <%= f.submit "Add" %>
-                        <% end %>
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                      <%= link_to 'Delete', portfolio_path(@asset), method: :delete %>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </td>
-                <script>
-                  $('#<%= @asset.name %>').on('click', function(){$('#<%= @asset.name %>').modal(`show`)});
-                </script>
-              <td><%= holding.num_of_shares %> Shares</td>
-            </tr>   
-            <script>
-            $.ajax({
-              url: "https://api.iextrading.com/1.0/stock/<%=@asset.name%>/company",
-              type: 'GET',
-              dataType: "JSON",
-              success: function(data) {
-                console.log(data)
-                $(".<%= @asset.name %>").after(`<tr><td>${data.description}</td></tr>`);
-                $(".<%= @asset.name %>").after(`<tr><td><a href="${data.website}" target="_blank">${data.companyName}</a></td><td>${data.industry}</td><td>${data.sector}</td></tr>`);
-                },
-            error: function (request, status, error) {
-              alert(error);
-            }
-          });
-            </script>
-    <div id="chart"></div>
-    <script data-require="d3@*" data-semver="4.0.0" src="https://d3js.org/d3.v4.min.js"></script>
-    <script>
-    $(document).ready(function () {
-      $.ajax({
-        url: "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=<%=@asset.name%>&interval=1min&apikey=<%=ENV['ALPHA_VANTAGE_KEY']%>",
-        type: 'GET',
-        dataType: "JSON",
-          success: function(data) {
-            console.log(data)
-            let symbol_key = data["Meta Data"]["2. Symbol"];
-            let last_price = data["Time Series (1min)"];
-            let price_key = Object.keys(last_price)[0];
-            let first_value = last_price[price_key]["4. close"];
-            let final_value = (first_value * <%= holding.num_of_shares %>);
-            let holding_hash = {name: symbol_key , price: final_value};
-            portfolio.push(holding_hash);
-            console.log(portfolio)
-            let ajax_complete = portfolio.length;
-            console.log(ajax_complete);
-              if (ajax_complete >= <%= @user_holdings.length %>){
-      (function(d3) {
 
+<canvas width="960" height="500"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+<script>
+
+var canvas = document.querySelector("canvas"),
+    context = canvas.getContext("2d");
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = canvas.width - margin.left - margin.right,
+    height = canvas.height - margin.top - margin.bottom;
+
+var x = d3.scaleBand()
+    .rangeRound([0, width])
+    .padding(0.1);
+
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+context.translate(margin.left, margin.top);
+
+d3.json("https://www.alphavantage.co/query?function=SECTOR&apikey=<%= ENV['ALPHA_VANTAGE_KEY']%>", function(error, data) {
+  if (error) throw error;
+      console.log("it begins"+ data);
+  e =  data["Rank A: Real-Time Performance"];
+  data.sector = e.keys;
+  data.frequency = +e.values;
+  data.title = data["Meta Data"]["Information"];
+  return data;
+
+  x.domain(data.map(function(d) { console.log(d); console.log(d.sector); return d.sector; }));
+  y.domain([0, d3.max(data, function(d) { console.log(d); console.log(d.frequency); return d.frequency; })]);
+
+  var yTickCount = 10,
+      yTicks = y.ticks(yTickCount),
+      yTickFormat = y.tickFormat(yTickCount, "%");
+
+  context.beginPath();
+  x.domain().forEach(function(d) {
+    context.moveTo(x(d) + x.bandwidth() / 2, height);
+    context.lineTo(x(d) + x.bandwidth() / 2, height + 6);
+  });
+  context.strokeStyle = "black";
+  context.stroke();
+
+  context.textAlign = "center";
+  context.textBaseline = "top";
+  x.domain().forEach(function(d) {
+    context.fillText(d, x(d) + x.bandwidth() / 2, height + 6);
+  });
+
+  context.beginPath();
+  yTicks.forEach(function(d) {
+    context.moveTo(0, y(d) + 0.5);
+    context.lineTo(-6, y(d) + 0.5);
+  });
+  context.strokeStyle = "black";
+  context.stroke();
+
+  context.textAlign = "right";
+  context.textBaseline = "middle";
+  yTicks.forEach(function(d) {
+    context.fillText(yTickFormat(d), -9, y(d));
+  });
+
+  context.beginPath();
+  context.moveTo(-6.5, 0 + 0.5);
+  context.lineTo(0.5, 0 + 0.5);
+  context.lineTo(0.5, height + 0.5);
+  context.lineTo(-6.5, height + 0.5);
+  context.strokeStyle = "black";
+  context.stroke();
+
+  context.save();
+  context.rotate(-Math.PI / 2);
+  context.textAlign = "right";
+  context.textBaseline = "top";
+  context.font = "bold 10px sans-serif";
+  context.fillText("Frequency", -10, 10);
+  context.restore();
+
+  context.fillStyle = "steelblue";
+  data.forEach(function(d) {
+    context.fillRect(x(d.sector), y(d.frequency), x.bandwidth(), height - y(d.frequency));
+  });
+});
+
+</script>
+
+
+
+
+
+
+<!-- <div id="chart"></div>--> 
+<!-- <canvas width="960" height="500"></canvas>--> 
+<!-- load the d3.js library -->     
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+
+<script>
         var width = 360;
         var height = 360;
-        var radius = Math.min(width, height) / 2;
-        var donutWidth = 75;
-        var legendRectSize = 18;
-        var legendSpacing = 4;
-
-        var color = d3.scaleOrdinal(d3.schemeCategory20b);
-
         var svg = d3.select('#chart')
           .append('svg')
           .attr('width', width)
@@ -108,96 +108,71 @@
           .attr('transform', 'translate(' + (width / 2) + 
             ',' + (height / 2) + ')');
 
-        var arc = d3.arc()
-          .innerRadius(radius - donutWidth)
-          .outerRadius(radius);
+var num = 10
+var dataset = d3.range(4).map((d, i) => {
+	return {key: i, values:d3.range(num).map(c => Math.random()*(i+1))}
+})
 
-        var pie = d3.pie()
-          .value(function(d) { return d.count; })
-          .sort(null);
+var groups = d3.select('svg')
+	.selectAll('g')
+	.data(dataset)
+	.enter()
+	.append('g')
+	.attr('transform', (d, i) => `translate(${i*100} ,0)`)
 
-        var tooltip = d3.select('#chart')                               // NEW
-          .append('div')                                                // NEW
-          .attr('class', 'tooltip');                                    // NEW
-                      
-        tooltip.append('div')                                           // NEW
-          .attr('class', 'label');                                      // NEW
-             
-        tooltip.append('div')                                           // NEW
-          .attr('class', 'count');                                      // NEW
+var mapX = d3.scaleLinear()
+	.domain([0, num-1])
+	.range([0, 80])
 
-        tooltip.append('div')                                           // NEW
-          .attr('class', 'percent');                                    // NEW
+var min = d3.min(dataset, d => d3.min(d.values, c => c))
+var max = d3.max(dataset, d => d3.max(d.values, c => c))
 
-            portfolio.forEach(function(d) {
-                d.price = +d.price;
-                d.name = d.name;
-                          })
+var mapY = d3.scaleLinear()
+	.domain([max, min])
+	.range([0, 100])
 
-          var path = svg.selectAll('path')
-            .data(pie(dataset))
-            .enter()
-            .append('path')
-            .attr('d', arc)
-            .attr('fill', function(d, i) { 
-              return color(d.data.label); 
-            });
+var lineGen = d3.line()
+	.x((d, i) => mapX(i))
+	.y(d => mapY(d))
 
-          path.on('mouseover', function(d) {                            // NEW
-            var total = d3.sum(dataset.map(function(d) {                // NEW
-              return d.count;                                           // NEW
-            }));                                                        // NEW
-            var percent = Math.round(1000 * d.data.count / total) / 10; // NEW
-            tooltip.select('.label').html(d.data.label);                // NEW
-            tooltip.select('.count').html(d.data.count);                // NEW
-            tooltip.select('.percent').html(percent + '%');             // NEW
-            tooltip.style('display', 'block');                          // NEW
-          });                                                           // NEW
-          
-          path.on('mouseout', function() {                              // NEW
-            tooltip.style('display', 'none');                           // NEW
-          });                                                           // NEW
+groups.append('path')
+	.attr('d', d => lineGen(d.values))
+	.style('fill', 'none')
+	.style('stroke', 'red')
 
-          /* OPTIONAL 
-          path.on('mousemove', function(d) {                            // NEW
-            tooltip.style('top', (d3.event.pageY + 10) + 'px')          // NEW
-              .style('left', (d3.event.pageX + 10) + 'px');             // NEW
-          });                                                           // NEW
-          */
-            
-          var legend = svg.selectAll('.legend')
-            .data(color.domain())
-            .enter()
-            .append('g')
-            .attr('class', 'legend')
-            .attr('transform', function(d, i) {
-              var height = legendRectSize + legendSpacing;
-              var offset =  height * color.domain().length / 2;
-              var horz = -2 * legendRectSize;
-              var vert = i * height - offset;
-              return 'translate(' + horz + ',' + vert + ')';
-            });
+var axis = d3.axisRight(mapY)
+	.ticks(10)
 
-          legend.append('rect')
-            .attr('width', legendRectSize)
-            .attr('height', legendRectSize)                                   
-            .style('fill', color)
-            .style('stroke', color);
-            
-          legend.append('text')
-            .attr('x', legendRectSize + legendSpacing)
-            .attr('y', legendRectSize - legendSpacing)
-            .text(function(d) { return d; });
+groups.append('g')
+	.classed('ax', true)
+	.call(axis)
 
-        });
+// Get the data
+var canvas = document.querySelector("canvas"),
+    context = canvas.getContext("2d");
 
-      }
-      (window.d3);
-      },
-            error: function (request, status, error) {
-              alert(error);
-            }
-          });
-           });
-    </script>
-<% end %>
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = canvas.width - margin.left - margin.right,
+    height = canvas.height - margin.top - margin.bottom;
+
+var x = d3.scaleBand()
+    .rangeRound([0, width])
+    .padding(0.1);
+
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+context.translate(margin.left, margin.top);
+
+d3.json("https://www.alphavantage.co/query?function=SECTOR&apikey=<%= ENV['ALPHA_VANTAGE_KEY']%>", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+
+     console.log(data);
+
+
+
+});
+
+</script>-->
