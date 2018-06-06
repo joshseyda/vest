@@ -2,7 +2,7 @@
 
 <h1><%= @nyse.name %> </h1>
 <!-- Button trigger modal -->
-<button type="button" class="btn  offset-5" data-toggle="modal" data-target="#modalCenter">
+<button type="button" class="btn btn-portfolio" data-toggle="modal" data-target="#modalCenter">
 Add to Portfolio
 </button>
 <!-- Modal -->
@@ -33,7 +33,7 @@ Add to Portfolio
     </div>
   </div>
 </div>
-
+<div class="graph"></div>
 <div class="extras"></div>
 <!-- load the d3.js library -->     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
@@ -43,8 +43,9 @@ Add to Portfolio
               dataType: "JSON",
               success: function(data) {
                 console.log(data)
-                $(".extras").after(`<p class="show_desc">${data.description}</p>`);
+                
                 $(".extras").append(`<p><a href="${data.website}" target="_blank">${data.companyName}</a></p><p>Industry: ${data.industry}</p><p>Sector: ${data.sector}</p>`);
+                $(".extras").append(`<p class="show_desc">${data.description}</p>`);
                 },
             error: function (request, status, error) {
               alert(error);
@@ -73,7 +74,7 @@ var valueline = d3.line()
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
-var svg = d3.select("main").append("svg")
+var svg = d3.select(".graph").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -87,7 +88,7 @@ var div = d3.select("main").append("div")
 // Get the data
 d3.csv("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=<%= @nyse.name %>&outputsize=full&apikey=<%= ENV['ALPHA_VANTAGE_KEY'] %>&datatype=csv", function(error, data) {
   if (error) throw error;
-  $('.extras').append(`<p>Most recent price: $${data[0].close}</p>`);
+  $('.btn-portfolio').append(`<p>Most recent price: $${data[0].close}</p>`);
   // format the data
   data.forEach(function(d) {
           console.log(d);
