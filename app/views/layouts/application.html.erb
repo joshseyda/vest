@@ -19,24 +19,21 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item ">
             <% if user_signed_in? %>
-              <a class="nav-link" href="/users">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="/users">Home </a>
             <% else %>
-              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="/">Home </a>
             <% end %>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/nyse">NYSE</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/crypto">CRYPTO</a>
-            </li>
              <% if user_signed_in? %>
-                  <li><%= link_to 'Logout', destroy_user_session_path, method: :delete, authenticity_token: true %> </li>
-                <% else %>
-                  <li><%= link_to('Login', new_user_session_path)  %></li>
-                <% end %>
+              <li class="nav-item"><%= link_to 'Logout', destroy_user_session_path, method: :delete, authenticity_token: true %> </li>
+            <% else %>
+              <li class="nav-item"><%= link_to('Login', new_user_session_path)  %></li>
+            <% end %>
           </ul>
           <form class="form-inline mt-2 mt-md-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
