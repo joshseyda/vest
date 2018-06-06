@@ -2,6 +2,21 @@
 -------------------------------------------------- */
 /* Padding below the footer and lighter body text */
 
+.extras{
+    background-color: ghostwhite;
+    padding: 2%;
+    box-shadow: 2px 5px 5px;
+    margin-top: 2%;
+}
+.btn-portfolio{
+    border-color: slategrey;
+    background-color:  ghostwhite;
+    box-shadow:  2px 2px 2px;
+}
+footer{
+  margin-top: 5%;
+}
+
 body {
   padding-top: 3rem;
   padding-bottom: 3rem;
@@ -37,20 +52,7 @@ body {
   position: relative;
   width: 360px;
 }
-/* .tooltip {
-  background: #eee;
-  box-shadow: 0 0 5px #999999;
-  color: #333;
-  display: none;
-  font-size: 12px;
-  left: 130px;
-  padding: 10px;
-  position: absolute;
-  text-align: center;
-  top: 95px;
-  width: 80px;
-  z-index: 10;
-}   */
+
 div.tooltip {
   position: absolute;
   text-align: center;

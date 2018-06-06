@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Investment</title>
+    <title>Vest</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -30,9 +30,9 @@
               <a class="nav-link" href="/nyse">NYSE</a>
             </li>
              <% if user_signed_in? %>
-              <li class="nav-item"><%= link_to 'Logout', destroy_user_session_path, method: :delete, authenticity_token: true %> </li>
+              <li class="nav-item"><%= link_to 'Logout', destroy_user_session_path, method: :delete, authenticity_token: true, class: "nav-link" %> </li>
             <% else %>
-              <li class="nav-item"><%= link_to('Login', new_user_session_path)  %></li>
+              <li class="nav-item"><%= link_to 'Login', new_user_session_path, class: "nav-link" %></li>
             <% end %>
           </ul>
           <form class="form-inline mt-2 mt-md-0">
