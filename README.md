@@ -1,7 +1,7 @@
-# [Vest](https://vest-asset-management.herokuapp.com)
+# [Vest](https://vest-asset-manager.herokuapp.com)
 >Vest is a personal investment management tool, powered by the D3.js graphing library, Ruby on Rails, the Alpha Vantage API, and the IEXTrading API.
-![]()
-![]()
+![Portfolio](https://github.com/joshseyda/vest/blob/master/app/assets/images/Screen%20Shot%202018-06-06%20at%2023.20.31.png?raw=true)
+![Asset](https://github.com/joshseyda/vest/blob/master/app/assets/images/Screen%20Shot%202018-06-06%20at%2023.19.59.png?raw=true)
 ---
 ![GitHub issue age](https://img.shields.io/badge/created%20on-2018--06--01-brightgreen.svg)
 ![GitHub closed pull requests](https://img.shields.io/badge/closed%20pull%20requests-07-blue.svg) 
@@ -10,8 +10,12 @@
 ## Table of Contents
 
 - [Inspiration](#inspiration)
+- [How to Use](#how-to-use)
+- [Build Status](#build-status)
+- [Code Example](#code-style)
+- [Code Example](#code-example)
 - [Goals](#goals)
-- [Components](#components)
+- [Features](#features)
 	- [Technologies](#technologies)
 - [License](#license)
 ---
@@ -36,51 +40,51 @@ The state of the codebase is absolutely what was essential to build out in 5 day
 ## Code Example
 #### This is how I structured my API data before rendering 
 ```javascript
-            let symbol_key = data["Meta Data"]["2. Symbol"];
-            let last_price = data["Time Series (1min)"];
-            let price_key = Object.keys(last_price)[0];
-            let first_value = last_price[price_key]["4. close"];
-            let final_value = (first_value * <%= holding.num_of_shares %>);
-            let holding_hash = {name: symbol_key , price: final_value};
-            portfolio.push(holding_hash);
+        let symbol_key = data["Meta Data"]["2. Symbol"];
+        let last_price = data["Time Series (1min)"];
+        let price_key = Object.keys(last_price)[0];
+        let first_value = last_price[price_key]["4. close"];
+        let final_value = (first_value * <%= holding.num_of_shares %>);
+        let holding_hash = {name: symbol_key , price: final_value};
+        portfolio.push(holding_hash);
 ```
 #### Here is the begining of invoking the SVG element and passing elements from my object to be graphed
 ```javascript
-                   var svg2 = d3.select("#graph-div").append("svg")
-                          .attr("width", width)
-                          .attr("height", height)
-                          .append("g")
-                          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+         var svg2 = d3.select("#graph-div").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
                             
-                          portfolio.forEach(function(d) {
-                              d.price = +d.price;
-                              d.name = d.name;
-                          })
+            portfolio.forEach(function(d) {
+            d.price = +d.price;
+            d.name = d.name;
+            })
 
-                        var g2 = svg2.selectAll(".arc2")
-                            .data(pie(Object.values(portfolio)))
-                            .enter().append("g")
-                            .attr("class", "arc2");
+         var g2 = svg2.selectAll(".arc2")
+            .data(pie(Object.values(portfolio)))
+            .enter().append("g")
+            .attr("class", "arc2");
 
-                        g2.append("path")
-                            .attr("data-toggle", "tooltip")
-                            .attr("data-placement", "auto")
-                            .attr("data-trigger", "click hover")
-                            .attr("title", function(d){ return `$${d.data.price.toFixed(2)}`})
-                            .attr("d", arc2)
-                            .style("fill", function(d) {return color(d.data.name); })
-                            .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attrTween("d", tweenDonut);
+         g2.append("path")
+            .attr("data-toggle", "tooltip")
+            .attr("data-placement", "auto")
+            .attr("data-trigger", "click hover")
+            .attr("title", function(d){ return `$${d.data.price.toFixed(2)}`})
+            .attr("d", arc2)
+            .style("fill", function(d) {return color(d.data.name); })
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(2000)
+            .attrTween("d", tweenDonut);
 
-                        g2.append("text")
-                            .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-                            .attr("dy", ".35em")
-                            .text(function(d) { return d.data.name ; }); 
+        g2.append("text")
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(2000)
+            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+            .attr("dy", ".35em")
+            .text(function(d) { return d.data.name ; }); 
 ```
 ## Goals
 
@@ -107,7 +111,7 @@ My ultimate goal is to be able to showcase dynamic, interactive data visualizati
 ## License
 MIT License
 
-Copyright (c) [2018] [Alex Cooper, Caroline Russell, Josh Seyda]
+Copyright (c) [2018] [Josh Seyda]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
