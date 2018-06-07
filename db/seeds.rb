@@ -7,12 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 require 'csv'
 
-arr = ["BTC", "ETH", "XRP", "EOS", "LTC", "XLM", "TRX", "NEO"]
-arr.each do |elem|
-    Holding.create(name: elem, holding_type: "CRYPTO")
-end
-
-CSV.foreach("/Users/joshuaseyda/Documents/wdi1/passion/investment/public/NYSE_20180530.csv") do |row|
+CSV.foreach("../public/NYSE_20180530.csv") do |row|
     Holding.create(name: row[0], holding_type: "NYSE")
 end
 
@@ -27,13 +22,6 @@ end
     @port = Portfolio.create(user_id: @rand1, holding_type: @holding.holding_type, holding_id: @holding.id, num_of_shares: @rand2)
 end
  
-# 50.times do
-#  @holding = Holding.where("holding_type ='CRYPTO'")
-#  @holding_sample = @holding.sample
-#  @rand1 = 1+rand(20)
-#     @rand2 = 1+rand(10000)
-#     @port = Portfolio.create(user_id: @rand1, holding_type: @holding_sample.holding_type, holding_id: @holding_sample.id, num_of_shares: @rand2)
-# end
 
 
 
