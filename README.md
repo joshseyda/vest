@@ -107,7 +107,7 @@ My ultimate goal is to be able to showcase dynamic, interactive data visualizati
 ## License
 MIT License
 
-Copyright (c) [2018] [Alex Cooper, Caroline Russell, Josh Seyda]
+Copyright (c) [2018] [Josh Seyda]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
