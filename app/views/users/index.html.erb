@@ -146,18 +146,18 @@ $(document).ready(function () {
                             .attr("class", "arc2");
 
                         // append path 
-                        g2.append("path")
-                        .attr("data-toggle", "tooltip")
-                           .attr("data-placement", "auto")
-                           .attr("data-trigger", "click hover")
-                           .attr("title", function(d){ return `$${d.data.price.toFixed(2)}`})
-                            .attr("d", arc2)
-                            .style("fill", function(d) { 
-                              return color(d.data.name); })
-                            .transition()
-                            .ease(d3.easeLinear)
-                            .duration(2000)
-                            .attrTween("d", tweenDonut);
+                      g2.append("path")
+                      .attr("data-toggle", "tooltip")
+                         .attr("data-placement", "auto")
+                         .attr("data-trigger", "click hover")
+                         .attr("title", function(d){ return `$${d.data.price.toFixed(2)}`})
+                          .attr("d", arc2)
+                          .style("fill", function(d) { 
+                            return color(d.data.name); })
+                          .transition()
+                          .ease(d3.easeLinear)
+                          .duration(2000)
+                          .attrTween("d", tweenDonut);
 
                         // append text
                         g2.append("text")
@@ -173,16 +173,6 @@ $(document).ready(function () {
                               return d.data.name ; });
                       };
 
-
-
-
-                      // Helper function for animation of pie chart and donut chart
-                      // function tweenPie(b) {
-                      //   b.innerRadius = 0;
-                      //   var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
-                      //   return function(t) { return arc(i(t)); };
-                      // }
-
                       function tweenDonut(b) {
                         b.innerRadius = 0;
                         var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
@@ -197,8 +187,6 @@ $(document).ready(function () {
                           $(this).tooltip('hide'); 
                           }
                       });
-
-
             },
             error: function (request, status, error) {
               alert(error);
