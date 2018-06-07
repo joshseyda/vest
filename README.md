@@ -4,7 +4,7 @@
 ![Asset](https://github.com/joshseyda/vest/blob/master/app/assets/images/Screen%20Shot%202018-06-06%20at%2023.19.59.png?raw=true)
 ---
 ![GitHub issue age](https://img.shields.io/badge/created%20on-2018--06--01-brightgreen.svg)
-![GitHub closed pull requests](https://img.shields.io/badge/closed%20pull%20requests-07-blue.svg) 
+![GitHub closed pull requests](https://img.shields.io/badge/closed%20pull%20requests-09-blue.svg) 
 ![CocoaPods](https://img.shields.io/cocoapods/l/AFNetworking.svg)
 ---
 ## Table of Contents
