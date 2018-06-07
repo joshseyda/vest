@@ -10,10 +10,10 @@
 ## Table of Contents
 
 - [Inspiration](#inspiration)
-- [How To Use] (#how_to_use)
-- [Build Status](#build_status)
-- [Code Style](#code_style)
-- [Code Example](#code_example)
+- [How To Use] (#how to use)
+- [Build Status](#build status)
+- [Code Style](#code style)
+- [Code Example](#code example)
 - [Goals](#goals)
 - [Features](#features)
 	- [Technologies](#technologies)
