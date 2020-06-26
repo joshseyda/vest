@@ -1,4 +1,4 @@
-# [Vest](https://vest-asset-manager.herokuapp.com)
+# Vest
 >Vest is a personal investment management tool, powered by the D3.js graphing library, Ruby on Rails, the Alpha Vantage API, and the IEXTrading API.
 ![Portfolio](https://github.com/joshseyda/vest/blob/master/app/assets/images/Screen%20Shot%202018-06-06%20at%2023.20.31.png?raw=true)
 ![Asset](https://github.com/joshseyda/vest/blob/master/app/assets/images/Screen%20Shot%202018-06-06%20at%2023.19.59.png?raw=true)
