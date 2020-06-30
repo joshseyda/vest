@@ -35,7 +35,7 @@ gem 'jbuilder', '~> 2.5'
 
 # Added by Josh
 gem 'devise'
-gem 'bootstrap', '~> 4.1.1'
+gem 'bootstrap', '~> 4.3.1'
 gem 'jquery-rails'
 gem 'faker', :git => 'https://github.com/stympy/faker.git', :branch => 'master'
 
