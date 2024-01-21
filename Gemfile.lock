@@ -129,7 +129,7 @@ GEM
     minitest (5.15.0)
     msgpack (1.2.4)
     multi_json (1.13.1)
-    nio4r (2.3.1)
+    nio4r (2.7.0)
     nokogiri (1.11.7)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
@@ -137,7 +137,7 @@ GEM
     pg (1.0.0)
     popper_js (1.16.0)
     public_suffix (3.0.2)
-    puma (4.3.8)
+    puma (5.6.8)
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
@@ -249,7 +249,7 @@ DEPENDENCIES
   jquery-rails
   listen (>= 3.0.5, < 3.2)
   pg (>= 0.18, < 2.0)
-  puma (~> 4.3)
+  puma (~> 5.6)
   rails (~> 5.2.0)
   sass-rails (~> 5.0)
   selenium-webdriver
